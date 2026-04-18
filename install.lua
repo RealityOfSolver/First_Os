@@ -135,5 +135,4 @@ end
 
 install(mode)
 
-print("")
-print("Done. You can reboot now.")
+shell.run("/setup.lua")
