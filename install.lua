@@ -4,7 +4,7 @@
 -- [D] = Delete + reinstall
 -- [C] = Cancel
 
-local BASE_URL = "https://raw.githubusercontent.com/RealityOfSolver/First_Os/main/"
+local BASE_URL = "http://raw.githubusercontent.com/RealityOfSolver/First_Os/main/"
 
 -- Put your files here (root files like ".config.lua" and folders like "os/.config.lua")
 local files = {
