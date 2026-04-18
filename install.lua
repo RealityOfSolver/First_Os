@@ -7,7 +7,7 @@
 
 -- IMPORTANT:
 -- If HTTPS doesn't work on your server, change https -> http below.
-local BASE_URL = "https://raw.githubusercontent.com/RealityOfSolver/First_Os/main/"
+local BASE_URL = "https://github.com/RealityOfSolver/First_Os/main"
 
 local files = {
     "os/.config.lua",
