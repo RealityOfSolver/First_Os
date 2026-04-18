@@ -13,103 +13,102 @@ local files = {
 }
 
 local function fileExists(path)
-  return fs.exists(path)
+    return fs.exists(path)
 end
 
 local function ensureDir(path)
-  local dir = fs.getDir(path)
-  if dir ~= "" and not fs.exists(dir) then
-    fs.makeDir(dir)
-  end
+    local dir = fs.getDir(path)
+    if dir ~= "" and not fs.exists(dir) then
+        fs.makeDir(dir)
+    end
 end
 
 local function deleteFile(path)
-  if fs.exists(path) then
-    fs.delete(path)
-  end
+    if fs.exists(path) then
+        fs.delete(path)
+    end
 end
 
 local function anyFilesExist()
-  for _, f in ipairs(files) do
-    if fileExists(f) then
-      return true
+    for _, f in ipairs(files) do
+        if fileExists(f) then
+            return true
+        end
     end
-  end
-  return false
+    return false
 end
 
 local function askChoice()
-  while true do
-    print("")
-    print("Some files already exist.")
-    print("[R] Install normally (overwrite)")
-    print("[D] Delete files then reinstall")
-    print("[C] Cancel")
-    write("Choice: ")
+    while true do
+        print("")
+        print("Some files already exist.")
+        print("[R] Install normally (overwrite)")
+        print("[D] Delete files then reinstall")
+        print("[C] Cancel")
+        write("Choice: ")
 
     local input = read()
     if input then input = input:upper() end
 
     if input == "R" or input == "D" or input == "C" then
-      return input
+        return input
     end
 
     print("Invalid choice. Please type R, D, or C.")
-  end
 end
 
 local function downloadFile(path)
-  ensureDir(path)
+    ensureDir(path)
 
-  local url = BASE_URL .. path
-  print("Downloading: " .. path)
+    local url = BASE_URL .. path
+    print("Downloading: " .. path)
 
-  local ok = shell.run("wget", "-f", url, path)
+    local ok = shell.run("wget", "-f", url, path)
 
-  if not ok then
-    print("FAILED: " .. path)
-    return false
-  end
+    if not ok then
+        print("FAILED: " .. path)
+        return false
+    end
 
-  return true
+    return true
 end
 
 local function install(mode)
-  if mode == "D" then
+    if mode == "D" then
+        print("")
+        print("Deleting old files...")
+        for _, f in ipairs(files) do
+            if fs.exists(f) then
+                print("Deleting: " .. f)
+                deleteFile(f)
+            end
+        end
+    end
+
     print("")
-    print("Deleting old files...")
+    print("Installing files...")
+
+    local failed = {}
+
     for _, f in ipairs(files) do
-      if fs.exists(f) then
-        print("Deleting: " .. f)
-        deleteFile(f)
-      end
+        local ok = downloadFile(f)
+        if not ok then
+            table.insert(failed, f)
+        end
     end
-  end
 
-  print("")
-  print("Installing files...")
-
-  local failed = {}
-
-  for _, f in ipairs(files) do
-    local ok = downloadFile(f)
-    if not ok then
-      table.insert(failed, f)
-    end
-  end
-
-  print("")
-  if #failed > 0 then
-    print("INSTALL FINISHED WITH ERRORS!")
-    print("Failed files:")
-    for _, f in ipairs(failed) do
-      print("- " .. f)
-    end
     print("")
-    print("Check if the files exist on GitHub and the branch is correct.")
-  else
-    print("INSTALL SUCCESS!")
-  end
+    if #failed > 0 then
+        print("INSTALL FINISHED WITH ERRORS!")
+        print("Failed files:")
+        for _, f in ipairs(failed) do
+            print("- " .. f)
+        end
+        print("")
+        print("Check if the files exist on GitHub and the branch is correct.")
+    else
+        print("INSTALL SUCCESS!")
+    end
 end
 
 -- MAIN
@@ -124,13 +123,13 @@ print("")
 local mode = "R"
 
 if anyFilesExist() then
-  mode = askChoice()
+    mode = askChoice()
 end
 
 if mode == "C" then
-  print("")
-  print("Cancelled.")
-  return
+    print("")
+    print("Cancelled.")
+    return
 end
 
 install(mode)
